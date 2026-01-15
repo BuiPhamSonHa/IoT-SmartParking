@@ -11,7 +11,6 @@ export type Kiosk = {
   temperatureC: number;
   humidityPct: number;
   smokeWarning?: boolean;
-  cameraImageUrl?: string | null;
 
   envStatus?: "GOOD" | "WARN" | "DANGER";
   updatedAt?: string;
@@ -33,8 +32,11 @@ export type ParkingSession = {
   priceVnd?: number | null;
 
   cameraImageUrl?: string | null;
+  cameraImageDataUrl?: string | null;
   entryPlateImageUrl?: string | null;
+  entryPlateImageDataUrl?: string | null;
   exitPlateImageUrl?: string | null;
+  exitPlateImageDataUrl?: string | null;
 };
 
 export type PricingConfig = {

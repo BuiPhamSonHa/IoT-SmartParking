@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Kiosk, ParkingSession, VehicleType } from "../data/types";
 import { Modal } from "./Modal";
-import { CameraFeed } from "./CameraFeed";
 import { useAppData } from "../data/AppDataContext";
 import { useToast } from "../ui/ToastContext";
 
@@ -63,7 +62,41 @@ export function KioskDetailModal(props: {
           </div>
 
           <div className="p-3">
-            <CameraFeed seed={kiosk.id} srcOverride={active?.cameraImageUrl || kiosk.cameraImageUrl || undefined} className="w-full aspect-video min-h-[300px] sm:min-h-[360px]" />
+            <div
+              className="w-full aspect-video min-h-[300px] sm:min-h-[360px] rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 overflow-hidden"
+            >
+              {active?.cameraImageDataUrl ? (
+                <img src={active.cameraImageDataUrl} alt="camera" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+                  No snapshot yet
+                </div>
+              )}
+            </div>
+
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden">
+                <div className="px-2 py-1 text-[11px] text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800">Plate (entry/exit)</div>
+                {(active?.exitPlateImageDataUrl || active?.entryPlateImageDataUrl) ? (
+                  <img
+                    src={active?.exitPlateImageDataUrl || active?.entryPlateImageDataUrl || undefined}
+                    alt="plate"
+                    className="w-full h-28 object-cover"
+                  />
+                ) : (
+                  <div className="h-28 flex items-center justify-center text-[11px] text-gray-500 dark:text-gray-400">--</div>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden">
+                <div className="px-2 py-1 text-[11px] text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800">Camera (entry)</div>
+                {active?.cameraImageDataUrl ? (
+                  <img src={active.cameraImageDataUrl} alt="camera" className="w-full h-28 object-cover" />
+                ) : (
+                  <div className="h-28 flex items-center justify-center text-[11px] text-gray-500 dark:text-gray-400">--</div>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="px-4 pb-4 text-sm text-gray-700 dark:text-gray-200 grid grid-cols-1 sm:grid-cols-2 gap-2">

@@ -28,6 +28,7 @@ export function HistoryTable(props: { rows: ParkingSession[]; kioskNameOf: (id: 
               <th className="p-3">Loại xe</th>
               <th className="p-3">Kiot</th>
               <th className="p-3">Giá (VND)</th>
+              <th className="p-3">Ảnh</th>
               <th className="p-3">Trạng thái</th>
             </tr>
           </thead>
@@ -39,13 +40,35 @@ export function HistoryTable(props: { rows: ParkingSession[]; kioskNameOf: (id: 
                 <td className="p-3 font-medium">{r.plate}</td>
                 <td className="p-3">{vtLabel[r.vehicleType]}</td>
                 <td className="p-3">{props.kioskNameOf(r.kioskId)}</td>
-                <td className="p-3">{(r.priceVnd ?? 0).toLocaleString("vi-VN")}</td>
+                <td className="p-3">{(r.priceVnd ?? r.feeVnd ?? 0).toLocaleString("vi-VN")}</td>
+                <td className="p-3">
+                  <div className="flex items-center gap-2">
+                    {r.cameraImageDataUrl ? (
+                      <img
+                        src={r.cameraImageDataUrl}
+                        alt="camera"
+                        className="h-12 w-20 rounded-lg object-cover border border-gray-200 dark:border-gray-800"
+                      />
+                    ) : (
+                      <div className="h-12 w-20 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40 text-[10px] text-gray-500 dark:text-gray-400 flex items-center justify-center">--</div>
+                    )}
+                    {(r.exitPlateImageDataUrl || r.entryPlateImageDataUrl) ? (
+                      <img
+                        src={r.exitPlateImageDataUrl || r.entryPlateImageDataUrl || undefined}
+                        alt="plate"
+                        className="h-12 w-20 rounded-lg object-cover border border-gray-200 dark:border-gray-800"
+                      />
+                    ) : (
+                      <div className="h-12 w-20 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40 text-[10px] text-gray-500 dark:text-gray-400 flex items-center justify-center">--</div>
+                    )}
+                  </div>
+                </td>
                 <td className="p-3">{r.exitAt ? "Đã ra" : "Đang gửi"}</td>
               </tr>
             ))}
             {props.rows.length === 0 && (
               <tr>
-                <td className="p-4 text-gray-600 dark:text-gray-300" colSpan={7}>
+                <td className="p-4 text-gray-600 dark:text-gray-300" colSpan={8}>
                   Không có dữ liệu.
                 </td>
               </tr>

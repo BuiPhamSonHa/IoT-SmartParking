@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { Kiosk, ParkingSession, VehicleType } from "../data/types";
-import { CameraFeed } from "./CameraFeed";
 import { Droplet, Info, LogIn, LogOut, Thermometer } from "lucide-react";
 
 function fmt(iso?: string) {
@@ -82,6 +81,10 @@ export function KioskCard(props: {
   const { kiosk, activeSession } = props;
   const status: "FULL" | "TRỐNG" = activeSession ? "FULL" : "TRỐNG";
 
+  // Dashboard should show event snapshots (ENTRY/EXIT) even though telemetry camera monitoring is disabled.
+  const camSrc = activeSession?.cameraImageDataUrl || null;
+  const plateSrc = activeSession?.exitPlateImageDataUrl || activeSession?.entryPlateImageDataUrl || null;
+
   const [plate, setPlate] = useState("");
   const [vehicleType, setVehicleType] = useState<VehicleType>("CAR");
 
@@ -125,24 +128,37 @@ export function KioskCard(props: {
       <div className="mt-4 grid grid-cols-1 xl:grid-cols-[minmax(420px,640px)_minmax(0,1fr)] gap-4 items-start">
         {/* Camera */}
         <div className="space-y-3 min-w-0">
-          <CameraFeed
-            seed={kiosk.id}
-            srcOverride={kiosk.cameraImageUrl || undefined}
-            className="w-full max-w-full aspect-video min-h-[220px] sm:min-h-[260px] md:min-h-[300px] xl:min-h-0"
-            overlayLeft={<span>Camera • {kiosk.name}</span>}
-            overlayRight={
-              <div className="flex gap-2">
-                <div className={"inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-xl border font-semibold bg-black/45 text-white border-white/20"}>
-                  <Thermometer className="h-4 w-4" />
-                  {tempLabel(tLv).replace("Nhiệt độ: ", "")}
-                </div>
-                <div className={"inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-xl border font-semibold bg-black/45 text-white border-white/20"}>
-                  <Droplet className="h-4 w-4" />
-                  {humLabel(hLv).replace("Độ ẩm: ", "")}
-                </div>
+          <div
+            className="w-full max-w-full aspect-video min-h-[220px] sm:min-h-[260px] md:min-h-[300px] xl:min-h-0 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 overflow-hidden"
+          >
+            {camSrc ? (
+              <img src={camSrc} alt="camera" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+                No snapshot yet
               </div>
-            }
-          />
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden">
+              <div className="px-2 py-1 text-[11px] text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800">Plate</div>
+              {plateSrc ? (
+                <img src={plateSrc} alt="plate" className="w-full h-24 object-cover" />
+              ) : (
+                <div className="h-24 flex items-center justify-center text-[11px] text-gray-500 dark:text-gray-400">--</div>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden">
+              <div className="px-2 py-1 text-[11px] text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800">Camera (event)</div>
+              {camSrc ? (
+                <img src={camSrc} alt="camera" className="w-full h-24 object-cover" />
+              ) : (
+                <div className="h-24 flex items-center justify-center text-[11px] text-gray-500 dark:text-gray-400">--</div>
+              )}
+            </div>
+          </div>
 
           {/* Sensor detail chips */}
           <div className="grid grid-cols-2 gap-2">

@@ -84,3 +84,46 @@ curl -s -X POST http://localhost:8080/api/v1/kiosks/k1/vehicle-events \
 
 ### Idempotency (recommended)
 When calling vehicle-events, you can include `eventId` to avoid duplicates on retry.
+
+
+
+## Multipart / form-data image upload (no URL needed)
+
+### Telemetry with snapshot image (multipart)
+```bash
+curl -X POST "http://localhost:8080/api/v1/kiosks/k1/telemetry" \
+  -H "X-DEVICE-KEY: secret" \
+  -F "temperatureC=31.2" \
+  -F "humidityPct=70" \
+  -F "smoke=false" \
+  -F "ts=2026-01-15T10:00:00Z" \
+  -F "cameraSnapshot=@./sample_cam.jpg"
+```
+
+### Vehicle ENTRY with camera + plate snapshots (multipart)
+```bash
+curl -X POST "http://localhost:8080/api/v1/kiosks/k1/vehicle-events" \
+  -H "X-DEVICE-KEY: secret" \
+  -F "type=ENTRY" \
+  -F "plate=30A12345" \
+  -F "vehicleType=CAR" \
+  -F "ts=2026-01-15T10:01:00Z" \
+  -F "eventId=evt-entry-001" \
+  -F "cameraSnapshot=@./sample_cam.jpg" \
+  -F "plateSnapshot=@./sample_plate.jpg"
+```
+
+### Vehicle EXIT with snapshots (multipart)
+```bash
+curl -X POST "http://localhost:8080/api/v1/kiosks/k1/vehicle-events" \
+  -H "X-DEVICE-KEY: secret" \
+  -F "type=EXIT" \
+  -F "ts=2026-01-15T11:01:00Z" \
+  -F "eventId=evt-exit-001" \
+  -F "cameraSnapshot=@./sample_cam2.jpg" \
+  -F "plateSnapshot=@./sample_plate2.jpg"
+```
+
+Notes:
+- These endpoints still accept legacy JSON with `cameraSnapshotUrl` / `plateSnapshotUrl`.
+- When you send files, backend saves them under `backend/media/` (or `/app/media` in Docker) and returns `cameraImageDataUrl` for direct rendering on the dashboard.

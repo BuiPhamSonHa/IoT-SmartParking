@@ -19,7 +19,7 @@ const [detailKioskId, setDetailKioskId] = useState<string | null>(null);
         <div>
           <div className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-gray-100">Dashboard</div>
           <div className="text-sm text-gray-600 dark:text-gray-300">
-            Theo dõi kiot, camera, xe vào/ra và cảm biến (realtime)
+            Theo dõi kiot, xe vào/ra và cảm biến (realtime)
           </div>
         </div>
       </div>
