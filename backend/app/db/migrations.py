@@ -23,7 +23,6 @@ def init_db(conn: sqlite3.Connection) -> None:
       temperature_c REAL,
       humidity_pct REAL,
       smoke INTEGER NOT NULL DEFAULT 0,
-      camera_snapshot_url TEXT,
 
       updated_at TEXT NOT NULL
     )

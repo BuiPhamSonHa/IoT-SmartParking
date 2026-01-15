@@ -3,6 +3,7 @@ from typing import Optional, Any
 from ..db.database import db
 from ..schemas.common import VehicleType
 from .utils import parse_iso_or_now, now_utc_iso, start_of_day_utc
+from .media_service import file_ref_to_data_url
 from .pricing_service import calc_fee_vnd
 from ..core.config import settings
 
@@ -20,8 +21,11 @@ def _row_to_session(r) -> dict:
         "durationMinutes": r["duration_minutes"],
         "feeVnd": r["fee_vnd"],
         "cameraImageUrl": r["entry_camera_url"] if r["exit_at"] is None else (r["exit_camera_url"] or r["entry_camera_url"]),
+        "cameraImageDataUrl": file_ref_to_data_url(r["entry_camera_url"] if r["exit_at"] is None else (r["exit_camera_url"] or r["entry_camera_url"])),
         "entryPlateImageUrl": r["entry_plate_url"],
+        "entryPlateImageDataUrl": file_ref_to_data_url(r["entry_plate_url"]),
         "exitPlateImageUrl": r["exit_plate_url"],
+        "exitPlateImageDataUrl": file_ref_to_data_url(r["exit_plate_url"]),
     }
 
 def start_session(kiosk_id: str, plate: str, vehicle_type: VehicleType, ts: str | None, camera_url: str | None, plate_url: str | None):
@@ -44,9 +48,10 @@ def start_session(kiosk_id: str, plate: str, vehicle_type: VehicleType, ts: str 
         )
         session_id = int(conn.execute("SELECT last_insert_rowid()").fetchone()[0])
         conn.execute(
-            """UPDATE kiosks SET occupied=1, current_session_id=?, current_plate=?, current_vehicle_type=?, current_entry_at=?, camera_snapshot_url=?, updated_at=?
+            """UPDATE kiosks
+                 SET occupied=1, current_session_id=?, current_plate=?, current_vehicle_type=?, current_entry_at=?, updated_at=?
                  WHERE id=?""",
-            (session_id, plate, vehicle_type, entry_iso, camera_url, now, kiosk_id),
+            (session_id, plate, vehicle_type, entry_iso, now, kiosk_id),
         )
         s = conn.execute("SELECT * FROM vehicle_sessions WHERE id=?", (session_id,)).fetchone()
     return _row_to_session(s), None
@@ -82,9 +87,9 @@ def end_session(kiosk_id: str, ts: str | None, camera_url: str | None, plate_url
         conn.execute(
             """UPDATE kiosks
                  SET occupied=0, current_session_id=NULL, current_plate=NULL, current_vehicle_type=NULL, current_entry_at=NULL,
-                     camera_snapshot_url=?, updated_at=?
+                     updated_at=?
                  WHERE id=?""",
-            (camera_url, now, kiosk_id),
+            (now, kiosk_id),
         )
         s2 = conn.execute("SELECT * FROM vehicle_sessions WHERE id=?", (session_id,)).fetchone()
     return _row_to_session(s2), None

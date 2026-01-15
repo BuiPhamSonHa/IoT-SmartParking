@@ -13,7 +13,6 @@ class KioskOut(BaseModel):
     temperatureC: float = 0.0
     humidityPct: float = 0.0
     smokeWarning: bool = False
-    cameraImageUrl: Optional[str] = None
     updatedAt: str
     envStatus: str
 

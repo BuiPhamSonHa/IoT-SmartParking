@@ -32,8 +32,8 @@ def sim_telemetry(payload: SimTelemetryIn):
     temp = payload.temperatureC if payload.temperatureC is not None else random.randint(20, 45)
     hum = payload.humidityPct if payload.humidityPct is not None else random.randint(25, 95)
     smoke = payload.smoke if payload.smoke is not None else (random.random() < 0.03)
-    cam = f"/cameras/cam{random.randint(1,6)}.jpg"
-    k = update_telemetry(payload.kioskId, temp, hum, smoke, cam)
+    # Telemetry is sensor-only; no camera snapshot is stored.
+    k = update_telemetry(payload.kioskId, temp, hum, smoke)
     emit("SIM_TELEMETRY", {"kiosk": k}, kiosk_id=payload.kioskId)
     return {"ok": True, "kiosk": k}
 
